@@ -1,7 +1,7 @@
 const http = require('http');
 
 const server = http.createServer((req, res) => {
-  res.end("Hello from GKE 🚀");
+  res.end("My Automated GKE App is LIVE! 🚀");
 });
 
 server.listen(3000, () => {
