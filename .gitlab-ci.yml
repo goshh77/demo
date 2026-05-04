@@ -1,10 +1,12 @@
 stages:
   - build
-  - deploy
+  - deploy_gke      # For Backend
+  - deploy_cloudrun # For Frontend
 
 variables:
-  # This builds the full path to your Google Artifact Registry
-  IMAGE: $REGION-docker.pkg.dev/$GCP_PROJECT_ID/my-app-repo/my-app
+  # Two different image paths
+  FRONT_IMAGE: $REGION-docker.pkg.dev/$GCP_PROJECT_ID/my-app-repo/frontend
+  BACK_IMAGE: $REGION-docker.pkg.dev/$GCP_PROJECT_ID/my-app-repo/backend
   DOCKER_TLS_CERTDIR: "" 
 
 build:
@@ -13,29 +15,39 @@ build:
   services:
     - docker:dind
   script:
-    # Login using the File variable
     - cat $GCP_SERVICE_KEY | docker login -u _json_key --password-stdin https://$REGION-docker.pkg.dev
-    # Build and Push
-    - docker build -t $IMAGE:$CI_COMMIT_SHA .
-    - docker push $IMAGE:$CI_COMMIT_SHA
+    # Build and Push Backend
+    - docker build -t $BACK_IMAGE:$CI_COMMIT_SHA -f Dockerfile.backend .
+    - docker push $BACK_IMAGE:$CI_COMMIT_SHA
+    # Build and Push Frontend
+    - docker build -t $FRONT_IMAGE:$CI_COMMIT_SHA -f Dockerfile.frontend .
+    - docker push $FRONT_IMAGE:$CI_COMMIT_SHA
 
-deploy:
-  stage: deploy
+deploy_backend_to_gke:
+  stage: deploy_gke
   image: google/cloud-sdk:latest
   script:
-    # 1. Authenticate
     - gcloud auth activate-service-account --key-file=$GCP_SERVICE_KEY
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud container clusters get-credentials $GKE_CLUSTER_NAME --region $REGION
-
-    # 2. Replace placeholders in deployment.yaml
-    - sed -i "s|REGION|$REGION|g" k8s/deployment.yaml
-    - sed -i "s|PROJECT_ID|$GCP_PROJECT_ID|g" k8s/deployment.yaml
-    - sed -i "s|IMAGE_TAG|$CI_COMMIT_SHA|g" k8s/deployment.yaml
-
-    # 3. Apply to Kubernetes
-    # First, create the namespace
+    # Update the GKE manifest for the backend
+    - sed -i "s|REGION|$REGION|g" k8s/backend.yaml
+    - sed -i "s|PROJECT_ID|$GCP_PROJECT_ID|g" k8s/backend.yaml
+    - sed -i "s|IMAGE_TAG|$CI_COMMIT_SHA|g" k8s/backend.yaml
+    # Apply
     - kubectl apply -f k8s/namespace.yaml
-    # Deploy the app and service into that namespace
-    - kubectl apply -n project-dev -f k8s/deployment.yaml
-    - kubectl apply -n project-dev -f k8s/service.yaml
+    - kubectl apply -f k8s/backend.yaml
+
+deploy_frontend_to_cloudrun:
+  stage: deploy_cloudrun
+  image: google/cloud-sdk:latest
+  script:
+    - gcloud auth activate-service-account --key-file=$GCP_SERVICE_KEY
+    - gcloud config set project $GCP_PROJECT_ID
+    # Deploy to Cloud Run and inject the Backend IP via environment variable
+    - gcloud run deploy frontend-service 
+      --image $FRONT_IMAGE:$CI_COMMIT_SHA 
+      --platform managed 
+      --region $REGION 
+      --allow-unauthenticated
+      --set-env-vars BACKEND_URL=$BACKEND_URL
