@@ -5,6 +5,8 @@ metadata:
   namespace: project-dev
 spec:
   replicas: 1
+  strategy:
+    type: Recreate # This stops the old pod before starting the new one to save resources
   selector:
     matchLabels:
       app: backend
@@ -18,6 +20,14 @@ spec:
         image: REGION-docker.pkg.dev/PROJECT_ID/my-app-repo/backend:IMAGE_TAG
         ports:
         - containerPort: 5000
+        # GKE Autopilot works best with these specific resource requests
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 ---
 apiVersion: v1
 kind: Service
