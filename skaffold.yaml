@@ -1,0 +1,9 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+
+manifests:
+  rawYaml:
+    - k8s/namespace.yaml
+    - k8s/backend.yaml
+    - k8s/deployment.yaml
+    - k8s/service.yaml
