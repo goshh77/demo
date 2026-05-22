@@ -35,3 +35,6 @@ steps:
 images:
 - 'asia-south1-docker.pkg.dev/harsha-497107/demo/frontend:v1'
 - 'asia-south1-docker.pkg.dev/harsha-497107/demo/backend:v1'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
