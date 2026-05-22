@@ -1,19 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: my-app
+  namespace: project-dev
+
 spec:
   replicas: 2
+
   selector:
     matchLabels:
       app: my-app
+
   template:
     metadata:
       labels:
         app: my-app
+
     spec:
       containers:
       - name: my-app
-        image: REGION-docker.pkg.dev/PROJECT_ID/my-app-repo/my-app:IMAGE_TAG
+
+        image: asia-south1-docker.pkg.dev/harsha-497107/demo/frontend:v1
+
         ports:
-        - containerPort: 3000
+        - containerPort: 8080
+
+        env:
+        - name: BACKEND_URL
+          value: "http://my-backend-service"

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: REGION-docker.pkg.dev/PROJECT_ID/my-app-repo/backend:IMAGE_TAG
+        image: asia-south1-docker.pkg.dev/harsha-497107/demo/backend:v1
         ports:
         - containerPort: 5000
         # GKE Autopilot works best with these specific resource requests

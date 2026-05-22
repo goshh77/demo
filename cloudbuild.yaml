@@ -1,0 +1,37 @@
+steps:
+
+# Build frontend image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - build
+  - '-t'
+  - 'asia-south1-docker.pkg.dev/harsha-497107/demo/frontend:v1'
+  - '-f'
+  - 'Dockerfile.frontend'
+  - '.'
+
+# Push frontend image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - push
+  - 'asia-south1-docker.pkg.dev/harsha-497107/demo/frontend:v1'
+
+# Build backend image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - build
+  - '-t'
+  - 'asia-south1-docker.pkg.dev/harsha-497107/demo/backend:v1'
+  - '-f'
+  - 'Dockerfile.backend'
+  - '.'
+
+# Push backend image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - push
+  - 'asia-south1-docker.pkg.dev/harsha-497107/demo/backend:v1'
+
+images:
+- 'asia-south1-docker.pkg.dev/harsha-497107/demo/frontend:v1'
+- 'asia-south1-docker.pkg.dev/harsha-497107/demo/backend:v1'
