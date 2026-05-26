@@ -1,18 +1,29 @@
-name: First GitHub Action
+name: Node.js CI Pipeline
 
 on:
   push:
 
 jobs:
-  explore-runner:
+  nodejs-workflow:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print Hello
-        run: echo "GitHub Actions Started"
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Show Current Directory
-        run: pwd
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: List Files
-        run: ls -la
+      - name: Verify Node.js
+        run: node -v
+
+      - name: Verify npm
+        run: npm -v
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Application
+        run: node app.js
