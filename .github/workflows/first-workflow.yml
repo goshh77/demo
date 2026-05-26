@@ -38,6 +38,18 @@ jobs:
           docker push \
           asia-south1-docker.pkg.dev/harsha-497107/demo/frontend:v1
 
+                - name: Build Backend Docker Image
+        run: |
+          docker build \
+          -f Dockerfile.backend \
+          -t asia-south1-docker.pkg.dev/harsha-497107/demo/backend:v1 .
+
+      - name: Push Backend Docker Image
+        run: |
+          docker push \
+          asia-south1-docker.pkg.dev/harsha-497107/demo/backend:v1
+
+
       - name: Connect to GKE Cluster
         run: |
           export USE_GKE_GCLOUD_AUTH_PLUGIN=True
@@ -48,6 +60,7 @@ jobs:
 
       - name: Deploy to GKE
         run: |
+          kubectl apply -f k8s/backend.yaml
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
