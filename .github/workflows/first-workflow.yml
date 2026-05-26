@@ -19,8 +19,13 @@ jobs:
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Install GKE Auth Plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin --quiet
+
       - name: Configure Docker Authentication
-        run: gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+        run: |
+          gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
 
       - name: Build Docker Image
         run: |
@@ -35,6 +40,8 @@ jobs:
 
       - name: Connect to GKE Cluster
         run: |
+          export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
           gcloud container clusters get-credentials demo-cluster \
           --region asia-south1 \
           --project harsha-497107
@@ -44,3 +51,8 @@ jobs:
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
+
+      - name: Verify Deployment
+        run: |
+          kubectl get pods -n project-dev
+          kubectl get services -n project-dev
