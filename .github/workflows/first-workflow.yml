@@ -1,10 +1,10 @@
-name: Push Docker Image to Artifact Registry
+name: Full CI/CD Pipeline
 
 on:
   push:
 
 jobs:
-  docker-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,3 +32,15 @@ jobs:
         run: |
           docker push \
           asia-south1-docker.pkg.dev/harsha-497107/demo/frontend:v1
+
+      - name: Connect to GKE Cluster
+        run: |
+          gcloud container clusters get-credentials demo-cluster \
+          --region asia-south1 \
+          --project harsha-497107
+
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
