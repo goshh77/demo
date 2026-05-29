@@ -21,7 +21,7 @@ spec:
       containers:
       - name: my-app
 
-        image: asia-south1-docker.pkg.dev/harsha-497107/demo/frontend:v1
+        image: us-central1-docker.pkg.dev/harsha-01-497805/demo/frontend:v1
 
         ports:
         - containerPort: 8080
