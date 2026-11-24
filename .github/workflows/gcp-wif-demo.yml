@@ -1,0 +1,43 @@
+name: gcp-wif-demo
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write   # required to request the OIDC token
+
+jobs:
+  gcp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/453073185656/locations/global/workloadIdentityPools/github-prod-2/providers/gh-goshh77
+          service_account: wif-github-prod-demo@newprj-harsha.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: |
+          for i in $(seq 1 12); do gcloud projects describe newprj-harsha --format='value(projectId,projectNumber)' && break; [ $i = 12 ] && exit 1; sleep 15; done
+      - run: |
+          for i in $(seq 1 12); do gcloud projects describe newprj-harsha --format='value(projectId,projectNumber)' && break; [ $i = 12 ] && exit 1; sleep 15; done
+      - run: |
+          for i in $(seq 1 12); do gcloud projects describe newprj-harsha --format='value(projectId,projectNumber)' && break; [ $i = 12 ] && exit 1; sleep 15; done
+      - run: |
+          for i in $(seq 1 12); do gcloud projects describe newprj-harsha --format='value(projectId,projectNumber)' && break; [ $i = 12 ] && exit 1; sleep 15; done
+      - run: |
+          for i in $(seq 1 12); do gcloud projects describe newprj-harsha --format='value(projectId,projectNumber)' && break; [ $i = 12 ] && exit 1; sleep 15; done
+      # proof for gcp-wif-manager: real STS exchange / impersonation / read-only resource check
+      - name: wif-validation
+        if: always()
+        run: |
+          pip install --quiet google-auth requests
+          python .github/wif/validate_on_workload.py --config "$GOOGLE_APPLICATION_CREDENTIALS" --targets .github/wif/targets.json --workload demo > wif-validation.json || true
+          cat wif-validation.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wif-validation-demo
+          path: wif-validation.json

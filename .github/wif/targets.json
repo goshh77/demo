@@ -1,0 +1,32 @@
+[
+  {
+    "type": "project",
+    "name": "newprj-harsha",
+    "role": "roles/storage.admin",
+    "project": "newprj-harsha"
+  },
+  {
+    "type": "project",
+    "name": "newprj-harsha",
+    "role": "roles/artifactregistry.admin",
+    "project": "newprj-harsha"
+  },
+  {
+    "type": "project",
+    "name": "newprj-harsha",
+    "role": "roles/run.admin",
+    "project": "newprj-harsha"
+  },
+  {
+    "type": "project",
+    "name": "newprj-harsha",
+    "role": "roles/secretmanager.admin",
+    "project": "newprj-harsha"
+  },
+  {
+    "type": "project",
+    "name": "newprj-harsha",
+    "role": "roles/compute.admin",
+    "project": "newprj-harsha"
+  }
+]
